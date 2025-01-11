@@ -1,87 +1,118 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// @mui material components
+import React, { useState } from "react";
 import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import Button from "@mui/material/Button";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
 
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-
-// Material Dashboard 2 React examples
+import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import MasterCard from "examples/Cards/MasterCard";
-import DefaultInfoCard from "examples/Cards/InfoCards/DefaultInfoCard";
 
-// Billing page components
-import PaymentMethod from "layouts/billing/components/PaymentMethod";
-import Invoices from "layouts/billing/components/Invoices";
-import BillingInformation from "layouts/billing/components/BillingInformation";
-import Transactions from "layouts/billing/components/Transactions";
+import CreateInvoiceForm from "./components/CreateInvoiceForm";
+import InvoicesTable from "./components/InvoicesTable";
+import PaymentsTable from "./components/PaymentsTable";
+import billingData from "./data/billingData";
 
 function Billing() {
+  const [invoices, setInvoices] = useState(billingData.invoices);
+  const [payments, setPayments] = useState(billingData.payments);
+  const [openInvoiceModal, setOpenInvoiceModal] = useState(false);
+
+  const handleOpenInvoiceModal = () => setOpenInvoiceModal(true);
+  const handleCloseInvoiceModal = () => setOpenInvoiceModal(false);
+
+  const addInvoice = (newInvoice) => {
+    setInvoices([...invoices, newInvoice]);
+    handleCloseInvoiceModal();
+  };
+
+  const sendWhatsAppInvoice = (phone, invoiceUrl) => {
+    const url = `https://wa.me/${phone}?text=Your%20invoice%20is%20available%20here:%20${encodeURIComponent(
+      invoiceUrl
+    )}`;
+    window.open(url, "_blank");
+  };
+
   return (
     <DashboardLayout>
-      <DashboardNavbar absolute isMini />
-      <MDBox mt={8}>
-        <MDBox mb={3}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} lg={8}>
-              <Grid container spacing={3}>
-                <Grid item xs={12} xl={6}>
-                  <MasterCard number={4562112245947852} holder="jack peterson" expires="11/22" />
-                </Grid>
-                <Grid item xs={12} md={6} xl={3}>
-                  <DefaultInfoCard
-                    icon="account_balance"
-                    title="salary"
-                    description="Belong Interactive"
-                    value="+$2000"
-                  />
-                </Grid>
-                <Grid item xs={12} md={6} xl={3}>
-                  <DefaultInfoCard
-                    icon="paypal"
-                    title="paypal"
-                    description="Freelance Payment"
-                    value="$455.00"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <PaymentMethod />
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={12} lg={4}>
-              <Invoices />
-            </Grid>
+      <DashboardNavbar />
+      <MDBox pt={6} pb={3}>
+        <Grid container spacing={6}>
+          {/* Invoices Section */}
+          <Grid item xs={12}>
+            <Card>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="info"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="white">
+                  Invoices
+                </MDTypography>
+              </MDBox>
+              <MDBox pt={3} px={3}>
+                <Button variant="contained" color="primary" onClick={handleOpenInvoiceModal}>
+                  Create New Invoice
+                </Button>
+              </MDBox>
+              <MDBox pt={3}>
+                <InvoicesTable invoices={invoices} onSendWhatsApp={sendWhatsAppInvoice} />
+              </MDBox>
+            </Card>
           </Grid>
-        </MDBox>
-        <MDBox mb={3}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={7}>
-              <BillingInformation />
-            </Grid>
-            <Grid item xs={12} md={5}>
-              <Transactions />
-            </Grid>
+
+          {/* Payments Section */}
+          <Grid item xs={12}>
+            <Card>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="success"
+                borderRadius="lg"
+                coloredShadow="success"
+              >
+                <MDTypography variant="h6" color="white">
+                  Payments
+                </MDTypography>
+              </MDBox>
+              <MDBox pt={3}>
+                <PaymentsTable payments={payments} />
+              </MDBox>
+            </Card>
           </Grid>
-        </MDBox>
+        </Grid>
       </MDBox>
       <Footer />
+
+      {/* Create Invoice Modal */}
+      <Modal open={openInvoiceModal} onClose={handleCloseInvoiceModal}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: "8px",
+            width: 500,
+          }}
+        >
+          <CreateInvoiceForm onSubmit={addInvoice} onCancel={handleCloseInvoiceModal} />
+        </Box>
+      </Modal>
     </DashboardLayout>
   );
 }

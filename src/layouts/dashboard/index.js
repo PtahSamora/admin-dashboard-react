@@ -1,156 +1,138 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// @mui material components
+import React, { useContext } from "react";
 import Grid from "@mui/material/Grid";
-
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-
-// Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
 import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
-
-// Data
 import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
 import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
-
-// Dashboard components
-import Projects from "layouts/dashboard/components/Projects";
-import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
+import { SalariesContext } from "context/SalariesContext"; // Import the context for salaries
 
 function Dashboard() {
-  const { sales, tasks } = reportsLineChartData;
+  const { salaries } = useContext(SalariesContext); // Access salaries from context
+  const { tasks } = reportsLineChartData;
+
+  // Calculate the total salaries dynamically
+  const calculateTotalSalaries = (salaries) => {
+    return salaries.reduce((total, salary) => {
+      const additionsTotal = salary.additions.reduce((sum, addition) => sum + addition.amount, 0);
+      return total + salary.basicSalary + additionsTotal;
+    }, 0);
+  };
+
+  const totalSalaries = calculateTotalSalaries(salaries);
+
+  // Chart data for total salaries
+  const salariesChartData = {
+    labels: ["Total Salaries"],
+    datasets: [
+      {
+        label: "Salaries (R)",
+        data: [totalSalaries],
+        backgroundColor: "rgba(75, 192, 192, 0.6)",
+        borderColor: "rgba(75, 192, 192, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={3}>
         <Grid container spacing={3}>
+          {/* Registered Deaths */}
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="dark"
-                icon="weekend"
-                title="Bookings"
-                count={281}
-                percentage={{
-                  color: "success",
-                  amount: "+55%",
-                  label: "than lask week",
-                }}
-              />
-            </MDBox>
+            <ComplexStatisticsCard
+              color="primary"
+              icon="person"
+              title="Registered Deaths"
+              count={42} // Replace with dynamic count
+              percentage={{
+                color: "success",
+                amount: "+4%",
+                label: "than last week",
+              }}
+            />
           </Grid>
+          {/* Orders */}
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                icon="leaderboard"
-                title="Today's Users"
-                count="2,300"
-                percentage={{
-                  color: "success",
-                  amount: "+3%",
-                  label: "than last month",
-                }}
-              />
-            </MDBox>
+            <ComplexStatisticsCard
+              color="success"
+              icon="shopping_cart"
+              title="Orders"
+              count={30} // Replace with dynamic count
+              percentage={{
+                color: "success",
+                amount: "+10%",
+                label: "than last week",
+              }}
+            />
           </Grid>
+          {/* Revenue */}
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="success"
-                icon="store"
-                title="Revenue"
-                count="34k"
-                percentage={{
-                  color: "success",
-                  amount: "+1%",
-                  label: "than yesterday",
-                }}
-              />
-            </MDBox>
+            <ComplexStatisticsCard
+              color="info"
+              icon="attach_money"
+              title="Revenue"
+              count="R24,000" // Replace with dynamic revenue
+              percentage={{
+                color: "success",
+                amount: "+15%",
+                label: "than last week",
+              }}
+            />
           </Grid>
+          {/* Customers */}
           <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="primary"
-                icon="person_add"
-                title="Followers"
-                count="+91"
-                percentage={{
-                  color: "success",
-                  amount: "",
-                  label: "Just updated",
-                }}
-              />
-            </MDBox>
+            <ComplexStatisticsCard
+              color="warning"
+              icon="group"
+              title="Customers"
+              count={128} // Replace with dynamic count
+              percentage={{
+                color: "success",
+                amount: "+8%",
+                label: "than last week",
+              }}
+            />
           </Grid>
         </Grid>
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsBarChart
-                  color="info"
-                  title="website views"
-                  description="Last Campaign Performance"
-                  date="campaign sent 2 days ago"
-                  chart={reportsBarChartData}
-                />
-              </MDBox>
+            {/* Website Views (WhatsApp to Patreons) */}
+            <Grid item xs={12} lg={6}>
+              <ReportsBarChart
+                color="info"
+                title="WhatsApp Messages to Patreons"
+                description="Performance over the week"
+                chart={reportsBarChartData}
+              />
             </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsLineChart
-                  color="success"
-                  title="daily sales"
-                  description={
-                    <>
-                      (<strong>+15%</strong>) increase in today sales.
-                    </>
-                  }
-                  date="updated 4 min ago"
-                  chart={sales}
-                />
-              </MDBox>
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsLineChart
-                  color="dark"
-                  title="completed tasks"
-                  description="Last Campaign Performance"
-                  date="just updated"
-                  chart={tasks}
-                />
-              </MDBox>
+            {/* Total Salaries Chart */}
+            <Grid item xs={12} lg={6}>
+              <ReportsBarChart
+                color="success"
+                title="Patrons' Total Salaries"
+                description="Includes salaries and additions"
+                chart={salariesChartData}
+              />
             </Grid>
           </Grid>
         </MDBox>
-        <MDBox>
+        <MDBox mt={4.5}>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={8}>
-              <Projects />
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <OrdersOverview />
+            {/* Completed Tasks */}
+            <Grid item xs={12} lg={12}>
+              <ReportsLineChart
+                color="primary"
+                title="Completed Tasks"
+                description="Funerals completed tasks"
+                chart={tasks}
+              />
             </Grid>
           </Grid>
         </MDBox>
